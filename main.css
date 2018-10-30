@@ -1,0 +1,25 @@
+@import url('https://fonts.googleapis.com/css?family=Oxygen');
+
+h2 {
+	font-family: 'Oxygen', sans-serif;
+	color: black;
+	text-align: left;
+     }
+
+text{
+    font-family: 'Oxygen', sans-serif;
+    font-size:11px;
+}
+
+div.tooltip {	
+    position: absolute;			
+    width: auto;					
+    height: auto;					
+    padding: 2px;	
+	font-family: 'Oxygen', sans-serif;	
+    font-size:11px;			
+    /*border: 1px solid black;*/
+	background:white;
+	box-shadow: 3px 3px 2px lightgrey;
+    border-radius: 2px;						
+}
