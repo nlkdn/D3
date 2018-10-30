@@ -196,7 +196,3 @@ d3.csv('baseball_data.csv',function(d){
 			};
 	})
 	.then(d => draw(d));
-
-
-
-
