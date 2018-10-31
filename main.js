@@ -51,66 +51,6 @@ function draw(data){
         .append('g')
         .attr('transform',"translate(" + margin + ",0)")
         .call(yAxis)
-
-		// Add Bubbles
-        d3.select('svg')
-        .selectAll('circle')
-        .data(data)
-        .enter()
-        .append('circle')
-		// Bubble position
-        .attr("cx", d => xAvg(d["avg"]))
-        .attr("cy", d => yHR(d["HR"]))
-		// Bubble radius
-        .attr("r", function(d){
-                if (d['BMI']>30) {
-                        return 4+4;
-                } else
-                if (d['BMI']>25) {
-                        return 4+2;
-                } else
-                {
-                        return 4;
-                }
-        })
-		
-		//Coloring Bubbles
-        .attr("fill", function(d){
-                if (d['handedness']=='L') {
-                        return '#7fc97f';
-                } else
-                if (d['handedness']=='R') {
-                        return '#beaed4';
-                } else
-                {
-                        return '#fdc086';
-                }
-        })
-		.attr('stroke','black')
-		.attr('stroke-width','0.5')
-		
-		// Adding tooltip
-		.on("mouseover", function(d) {	
-			d3.select(this).style('stroke-width','1.5');
-			div.transition()		
-                .duration(200)		
-                .style("opacity", .9);		
-            div	.html( 'Name: ' + d['name'] +'<br>'+
-						'Handedness: ' + d.handedness +'<br>'+
-						'Height: ' + d.height +' inches <br>'+
-						'Weight: ' +d.weight+' lb <br>'+
-						'Batting Avg: ' +d.avg+'<br>'+
-						'Home Runs: ' +d.HR+'<br>'+
-						'BMI: ' + d.BMI )
-                .style("left", (d3.event.pageX+10) + "px")		
-                .style("top", (d3.event.pageY -100) + "px");	
-            })					
-        .on("mouseout", function(d) {
-			d3.select(this).style('stroke-width','0.5');			
-            div.transition()		
-                .duration(500)		
-                .style("opacity", 0);	
-        });
 		
 		//Adding legends
 		const legend  = svg.append('g')
@@ -122,7 +62,7 @@ function draw(data){
 		
 		legend.append('circle')
 			.attr('cy', (d,i) => i*30 )
-			.attr('r', d => 3)	
+			.attr('r', d => 4)	
 			.attr('fill',function(d){
 				if (d ==='L') {
 					return '#7fc97f';
@@ -181,8 +121,90 @@ function draw(data){
 			.attr("transform", "translate(" + (margin-30) + " ," + (height/2) + ") rotate(270)")
 			.style("text-anchor", "middle")
 			.text("Home Runs");
-
-}
+				
+		function update(data){	
+			
+			// Add Bubbles		
+		let bubbles = d3.select('svg')
+			.selectAll('circle')
+			.data(data)
+			.enter()
+			.append('circle')
+			
+			// Bubble position
+			.attr("cx", d => xAvg(d["avg"]))
+			.attr("cy", d => yHR(d["HR"]))
+			
+			// Bubble radius
+			.attr("r", function(d){
+					if (d['BMI']>30) {
+							return 4+4;
+					} else
+					if (d['BMI']>25) {
+							return 4+2;
+					} else
+					{
+							return 4;
+					}
+			})
+			
+			//Coloring Bubbles
+			.attr("fill", function(d){
+					if (d['handedness']=='L') {
+							return '#7fc97f';
+					} else
+					if (d['handedness']=='R') {
+							return '#beaed4';
+					} else
+					{
+							return '#fdc086';
+					}
+			})
+			.attr('stroke','black')
+			.attr('stroke-width','0.5')
+			.style('opacity',0);
+			
+			// Adding tooltip
+			bubbles.on("mouseover", function(d) {	
+				d3.select(this).style('stroke-width','1.5');
+				div.transition()		
+					.duration(200)		
+					.style("opacity", .9);		
+				div	.html( 'Name: ' + d['name'] +'<br>'+
+							'Handedness: ' + d.handedness +'<br>'+
+							'Height: ' + d.height +' inches <br>'+
+							'Weight: ' +d.weight+' lb <br>'+
+							'Batting Avg: ' +d.avg+'<br>'+
+							'Home Runs: ' +d.HR+'<br>'+
+							'BMI: ' + d.BMI )
+					.style("left", (d3.event.pageX+10) + "px")		
+					.style("top", (d3.event.pageY -100) + "px");	
+				})					
+				.on("mouseout", function(d) {
+				d3.select(this).style('stroke-width','0.5');			
+				div.transition()		
+					.duration(500)		
+					.style("opacity", 0);	
+			});		
+			
+			//Add transition animation
+			bubbles.transition()
+				.duration(500)
+				.style('opacity',1);
+			}
+		let new_data= [];
+		let index = 0;
+		let name_interval = setInterval(function(){
+				update(new_data);
+				new_data.push(data[index])
+				//console.log(data[index])
+				index++;
+					if(index >= data.length) {
+						clearInterval(name_interval);
+					}
+				},50);				
+			
+		}
 // Load data
 d3.csv('baseball_data.csv',function(d){
 	return  {
@@ -192,7 +214,7 @@ d3.csv('baseball_data.csv',function(d){
 			weight: +d.weight,
 			avg: +d.avg,
 			HR: +d.HR,
-			BMI:d3.format(".2f")((+d.weight/2.205)/((+d.height*0.0254)**2).toFixed(2))
+			BMI:d3.format(".2f")((+d.weight/2.205)/((+d.height*0.0254)**2))
 			};
 	})
 	.then(d => draw(d));
